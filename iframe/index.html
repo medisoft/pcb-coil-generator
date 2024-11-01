@@ -21,8 +21,8 @@
 				for (let turns = 0; turns <= numTurns && i < l; ) {
 					let a = 0.1 * i++;
 					points.push({
-						x: centerX + (internalRadius + trackSpacing * 0.5 * a) * Math.cos(a),
-						y: centerY + (internalRadius + trackSpacing * 0.5 * a) * Math.sin(a),
+						x: centerX + (internalRadius + trackSpacing * (1 / 3) * a) * Math.cos(a),
+						y: centerY + (internalRadius + trackSpacing * (1 / 3) * a) * Math.sin(a),
 					});
 					if (
 						points.length >= 2 &&
@@ -82,13 +82,13 @@
 				let separacionPistas = trackSpacing * milsToMm;
 
 				// External radius
-				const rExt = rInt + n * (anchoPista + separacionPistas);
+				const rExt = rInt + (n + 1) * (anchoPista + separacionPistas);
 
 				document.getElementById('internalRadiusMM').innerText = rInt.toLocaleString() + ' mm';
 				document.getElementById('externalRadiusMM').innerText = rExt.toLocaleString() + ' mm';
 				document.getElementById('externalDiameterMM').innerText = (rExt * 2).toLocaleString() + ' mm';
 
-				// Wheeler's Formula (Modified for Spiral Coils) for pancake pcb coils
+				// Wheeler's Formula (Modified for Spiral Coils) for pancake pcb coils https://www.deepfriedneon.com/tesla_f_calcspiral.html
 				const N = numTurns;
 				const Di = (+internalRadius / 1000) * 2;
 				const A = (Di + N * (+trackWidth / 1000 + +trackSpacing / 1000)) / 2;
@@ -114,12 +114,12 @@
 		<div><label for="numTurns">Number of turns</label></div>
 		<div><input type="number" id="numTurns" value="35" min="1" max="1000" onChange="calculateInductance()" /></div>
 		<div><label for="internalRadius">Internal Radius</label></div>
-		<div><input type="number" id="internalRadius" value="100" min="1" max="100000" onChange="calculateInductance()" /></div>
+		<div><input type="number" id="internalRadius" value="50" min="1" max="100000" onChange="calculateInductance()" /></div>
 
 		<div><label for="trackSpacing">Track Spacing</label></div>
-		<div><input type="number" id="trackSpacing" value="8" min="1" max="100" onChange="calculateInductance()" /></div>
+		<div><input type="number" id="trackSpacing" value="5" min="1" max="100" onChange="calculateInductance()" /></div>
 		<div><label for="trackWidth">Track Width</label></div>
-		<div><input type="number" id="trackWidth" value="8" min="1" max="100" onChange="calculateInductance()" /></div>
+		<div><input type="number" id="trackWidth" value="5" min="1" max="100" onChange="calculateInductance()" /></div>
 		<div><label for="centerX">Center value in X</label></div>
 		<div><input type="number" id="centerX" value="0" /></div>
 		<div><label for="centerY">Center value in Y</label></div>
