@@ -1,0 +1,47 @@
+{
+	"name": "pcb-coil-generator",
+	"uuid": "8efdfbcff39a4deebc7fec1f52e38b40",
+	"displayName": "PCB Coil Generator",
+	"description": "EasyEDA Pro PCB Coil Generator plugin",
+	"version": "0.0.4",
+	"publisher": "Mario Medina <osoverflow+easyeda@gmail.com>",
+	"engines": {
+		"eda": "^2.2.20"
+	},
+	"license": "Apache-2.0",
+	"repository": {
+		"type": "extension-store",
+		"url": ""
+	},
+	"categories": "Other",
+	"keywords": ["SDK"],
+	"images": {
+		"logo": "./images/logo.png",
+		"banner": "./images/banner.jpg"
+	},
+	"homepage": "https://pro.lceda.cn",
+	"bugs": "https://lceda.cn/page/feedback?originPage=other",
+	"activationEvents": {},
+	"entry": "./dist/index",
+	"dependentExtensions": {},
+	"headerMenus": {
+		"pcb": [
+			{
+				"id": "pcb-coil-generator",
+				"title": "PCB Coil Generator",
+				"menuItems": [
+					{
+						"id": "About",
+						"title": "About",
+						"registerFn": "about"
+					},
+					{
+						"id": "Generate",
+						"title": "Generate",
+						"registerFn": "generate"
+					}
+				]
+			}
+		]
+	}
+}

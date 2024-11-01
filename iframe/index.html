@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en-US">
+	<head>
+		<title>Coil Generator Extension</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<script>
+			const roundCoil = async (numTurns = 2, internalDiameter = 100, trackSpacing = 4, trackWidth = 4, centerX = 0, centerY = 0) => {
+				// Parameters to change
+				// let d = 100; // Internal Radius (in Mils)
+				// let s = 4; // Distance between tracks (in Mils)
+				// let numTurns = 2; // Number of turns of the coil
+				// let trackWidth = 4; // Width of the track (in Mils)
+				// Optional parameters
+				// let centerx = 0;
+				// let centery = 0;
+				// Do not change anything below unless you know what you are doing
+				let l = 1000000; // Safety number, should be removed after some tests. Prevents creating an infinite size coil, limiting the number of segments
+				let points = [];
+				let i = 0;
+				for (let turns = 0; turns <= numTurns && i < l; ) {
+					let a = 0.1 * i++;
+					points.push({
+						x: centerX + (internalDiameter + trackSpacing * 0.5 * a) * Math.cos(a),
+						y: centerY + (internalDiameter + trackSpacing * 0.5 * a) * Math.sin(a),
+					});
+					if (
+						points.length >= 2 &&
+						((points[points.length - 2].y <= centerY && points[points.length - 1].y > centerY) ||
+							(points[points.length - 2].y < centerY && points[points.length - 1].y >= centerY))
+					)
+						turns++;
+				}
+
+				for (let i = 1; i < points.length; i++) {
+					await eda.pcb_PrimitiveLine.create(
+						'GND',
+						1, //EPCB_LayerId.TOP,
+						points[i - 1].x,
+						points[i - 1].y,
+						points[i].x,
+						points[i].y,
+						trackWidth * 0.1,
+						false,
+					);
+				}
+			};
+
+			function callGenerator() {
+				let numTurns = Number(document.getElementById('numTurns').value),
+					internalDiameter = Number(document.getElementById('internalDiameter').value),
+					trackSpacing = Number(document.getElementById('trackSpacing').value),
+					trackWidth = Number(document.getElementById('trackWidth').value),
+					centerX = Number(document.getElementById('centerX').value),
+					centerY = Number(document.getElementById('centerY').value);
+				return roundCoil(numTurns, internalDiameter, trackSpacing, trackWidth, centerX, centerY)
+					.then((d) => {
+						console.log('Coil Generator', d);
+						return eda.sys_IFrame.closeIFrame();
+					})
+					.catch(console.error);
+			}
+
+			function doNothing() {
+				console.log('Close Generator Modal', eda);
+				return eda.sys_IFrame
+					.closeIFrame()
+					.then((d) => console.log('Close iframe', d))
+					.catch(console.error);
+			}
+		</script>
+	</head>
+	<body>
+		<div>NOTE: All units are in Mils</div>
+		<div><label for="numTurns">Number of turns</label></div>
+		<div><input type="number" id="numTurns" value="5" min="1" max="1000" /></div>
+		<div><label for="internalDiameter">Internal Diameter</label></div>
+		<div><input type="number" id="internalDiameter" value="100" min="1" max="100000" /></div>
+
+		<div><label for="trackSpacing">Track Spacing</label></div>
+		<div><input type="number" id="trackSpacing" value="4" min="1" max="100" /></div>
+		<div><label for="trackWidth">Track Width</label></div>
+		<div><input type="number" id="trackWidth" value="4" min="1" max="100" /></div>
+		<div><label for="centerX">Center value in X</label></div>
+		<div><input type="number" id="centerX" value="0" /></div>
+		<div><label for="centerY">Center value in Y</label></div>
+		<div><input type="number" id="centerY" value="0" /></div>
+
+		<input type="button" value="Generate coil" onClick="callGenerator()" />
+		<input type="button" value="Cancel" onClick="doNothing()" />
+	</body>
+</html>
