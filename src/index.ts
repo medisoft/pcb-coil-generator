@@ -56,7 +56,7 @@ export function about(): void {
 
 export function generate(runCommand = false): void {
 	if (!runCommand) {
-		eda.sys_IFrame.openIFrame('/iframe/index.html', 400, 300);
+		eda.sys_IFrame.openIFrame('/iframe/index.html', 400, 380);
 	} else {
 		eda.sys_IFrame.closeIFrame();
 	}

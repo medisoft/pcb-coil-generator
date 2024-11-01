@@ -5,7 +5,7 @@
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<script>
-			const roundCoil = async (numTurns = 2, internalDiameter = 100, trackSpacing = 4, trackWidth = 4, centerX = 0, centerY = 0) => {
+			const roundCoil = async (numTurns = 2, internalRadius = 100, trackSpacing = 4, trackWidth = 4, centerX = 0, centerY = 0) => {
 				// Parameters to change
 				// let d = 100; // Internal Radius (in Mils)
 				// let s = 4; // Distance between tracks (in Mils)
@@ -21,8 +21,8 @@
 				for (let turns = 0; turns <= numTurns && i < l; ) {
 					let a = 0.1 * i++;
 					points.push({
-						x: centerX + (internalDiameter + trackSpacing * 0.5 * a) * Math.cos(a),
-						y: centerY + (internalDiameter + trackSpacing * 0.5 * a) * Math.sin(a),
+						x: centerX + (internalRadius + trackSpacing * 0.5 * a) * Math.cos(a),
+						y: centerY + (internalRadius + trackSpacing * 0.5 * a) * Math.sin(a),
 					});
 					if (
 						points.length >= 2 &&
@@ -48,12 +48,12 @@
 
 			function callGenerator() {
 				let numTurns = Number(document.getElementById('numTurns').value),
-					internalDiameter = Number(document.getElementById('internalDiameter').value),
+					internalRadius = Number(document.getElementById('internalRadius').value),
 					trackSpacing = Number(document.getElementById('trackSpacing').value),
 					trackWidth = Number(document.getElementById('trackWidth').value),
 					centerX = Number(document.getElementById('centerX').value),
 					centerY = Number(document.getElementById('centerY').value);
-				return roundCoil(numTurns, internalDiameter, trackSpacing, trackWidth, centerX, centerY)
+				return roundCoil(numTurns, internalRadius, trackSpacing, trackWidth, centerX, centerY)
 					.then((d) => {
 						console.log('Coil Generator', d);
 						return eda.sys_IFrame.closeIFrame();
@@ -68,19 +68,58 @@
 					.then((d) => console.log('Close iframe', d))
 					.catch(console.error);
 			}
+
+			function calculateInductance() {
+				let numTurns = Number(document.getElementById('numTurns').value),
+					internalRadius = Number(document.getElementById('internalRadius').value),
+					trackSpacing = Number(document.getElementById('trackSpacing').value),
+					trackWidth = Number(document.getElementById('trackWidth').value);
+
+				const milsToMm = 0.0254;
+				let n = numTurns;
+				let rInt = internalRadius * milsToMm;
+				let anchoPista = trackWidth * milsToMm;
+				let separacionPistas = trackSpacing * milsToMm;
+
+				// External radius
+				const rExt = rInt + n * (anchoPista + separacionPistas);
+
+				document.getElementById('internalRadiusMM').innerText = rInt.toLocaleString() + ' mm';
+				document.getElementById('externalRadiusMM').innerText = rExt.toLocaleString() + ' mm';
+				document.getElementById('externalDiameterMM').innerText = (rExt * 2).toLocaleString() + ' mm';
+
+				// Wheeler's Formula (Modified for Spiral Coils) for pancake pcb coils
+				const N = numTurns;
+				const Di = (+internalRadius / 1000) * 2;
+				const A = (Di + N * (+trackWidth / 1000 + +trackSpacing / 1000)) / 2;
+				const inductance_uH = (Math.pow(A, 2) * Math.pow(N, 2)) / (30 * A - 11 * Di);
+
+				const inductance_H = inductance_uH * 1e-6;
+
+				if (inductance_H >= 1) document.getElementById('inductance').innerText = inductance_H.toLocaleString() + ' H';
+				else if (inductance_H >= 1e-3) document.getElementById('inductance').innerText = (inductance_H * 1e3).toLocaleString() + ' mH';
+				else if (inductance_H >= 1e-6) document.getElementById('inductance').innerText = (inductance_H * 1e6).toLocaleString() + ' uH';
+				else if (inductance_H >= 1e-9) document.getElementById('inductance').innerText = (inductance_H * 1e9).toLocaleString() + ' nH';
+				else if (inductance_H >= 1e-12) document.getElementById('inductance').innerText = (inductance_H * 1e12).toLocaleString() + ' pH';
+				else if (inductance_H >= 1e-15) document.getElementById('inductance').innerText = (inductance_H * 1e15).toLocaleString() + ' fH';
+				else document.getElementById('inductance').innerText = 'To small';
+				setTimeout(() => calculateInductance(), 1000);
+			}
+
+			setTimeout(() => calculateInductance(), 1000);
 		</script>
 	</head>
 	<body>
 		<div>NOTE: All units are in Mils</div>
 		<div><label for="numTurns">Number of turns</label></div>
-		<div><input type="number" id="numTurns" value="5" min="1" max="1000" /></div>
-		<div><label for="internalDiameter">Internal Diameter</label></div>
-		<div><input type="number" id="internalDiameter" value="100" min="1" max="100000" /></div>
+		<div><input type="number" id="numTurns" value="35" min="1" max="1000" onChange="calculateInductance()" /></div>
+		<div><label for="internalRadius">Internal Radius</label></div>
+		<div><input type="number" id="internalRadius" value="100" min="1" max="100000" onChange="calculateInductance()" /></div>
 
 		<div><label for="trackSpacing">Track Spacing</label></div>
-		<div><input type="number" id="trackSpacing" value="4" min="1" max="100" /></div>
+		<div><input type="number" id="trackSpacing" value="8" min="1" max="100" onChange="calculateInductance()" /></div>
 		<div><label for="trackWidth">Track Width</label></div>
-		<div><input type="number" id="trackWidth" value="4" min="1" max="100" /></div>
+		<div><input type="number" id="trackWidth" value="8" min="1" max="100" onChange="calculateInductance()" /></div>
 		<div><label for="centerX">Center value in X</label></div>
 		<div><input type="number" id="centerX" value="0" /></div>
 		<div><label for="centerY">Center value in Y</label></div>
@@ -88,5 +127,22 @@
 
 		<input type="button" value="Generate coil" onClick="callGenerator()" />
 		<input type="button" value="Cancel" onClick="doNothing()" />
+
+		<div>
+			Coil inductance:
+			<span id="inductance"></span>
+		</div>
+		<div>
+			Coil internal radius:
+			<span id="internalRadiusMM"></span>
+		</div>
+		<div>
+			Coil external radius:
+			<span id="externalRadiusMM"></span>
+		</div>
+		<div>
+			Coil external diameter:
+			<span id="externalDiameterMM"></span>
+		</div>
 	</body>
 </html>

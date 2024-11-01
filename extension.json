@@ -3,7 +3,7 @@
 	"uuid": "8efdfbcff39a4deebc7fec1f52e38b40",
 	"displayName": "PCB Coil Generator",
 	"description": "EasyEDA Pro PCB Coil Generator plugin",
-	"version": "0.0.4",
+	"version": "0.0.5",
 	"publisher": "Mario Medina <osoverflow+easyeda@gmail.com>",
 	"engines": {
 		"eda": "^2.2.20"
