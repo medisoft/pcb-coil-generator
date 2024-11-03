@@ -44,6 +44,19 @@
 						false,
 					);
 				}
+
+				// for (let i = points.length - 1; i > 0; i--) {
+				// 	await eda.pcb_PrimitiveLine.create(
+				// 		'GND',
+				// 		2, //EPCB_LayerId.BOTTOM,
+				// 		points[i - 1].x * -1,
+				// 		points[i - 1].y * -1,
+				// 		points[i].x * -1,
+				// 		points[i].y * -1,
+				// 		trackWidth * 0.1,
+				// 		false,
+				// 	);
+				// }
 			};
 
 			function callGenerator() {
@@ -85,6 +98,7 @@
 				const rExt = rInt + (n + 1) * (anchoPista + separacionPistas);
 
 				document.getElementById('internalRadiusMM').innerText = rInt.toLocaleString() + ' mm';
+				document.getElementById('internalDiameterMM').innerText = (rInt * 2).toLocaleString() + ' mm';
 				document.getElementById('externalRadiusMM').innerText = rExt.toLocaleString() + ' mm';
 				document.getElementById('externalDiameterMM').innerText = (rExt * 2).toLocaleString() + ' mm';
 
@@ -135,6 +149,10 @@
 		<div>
 			Coil internal radius:
 			<span id="internalRadiusMM"></span>
+		</div>
+		<div>
+			Coil internal diameter:
+			<span id="internalDiameterMM"></span>
 		</div>
 		<div>
 			Coil external radius:

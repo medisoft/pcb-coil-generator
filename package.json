@@ -1,6 +1,6 @@
 {
 	"name": "pcb-coil-generator",
-	"version": "0.0.6",
+	"version": "0.0.7",
 	"description": "EasyEDA Pro PCB Coil Generator plugin",
 	"author": "Mario Medina <osoverflow+easyeda@gmail.com>",
 	"license": "Apache-2.0",
